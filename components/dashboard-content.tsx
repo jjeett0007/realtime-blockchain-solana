@@ -42,29 +42,23 @@ export default function DashboardContent({ activeView }: DashboardContentProps) 
   const renderPanel = () => {
     switch (activeView) {
       case "overview":
-        return <OverviewPanel apiKey={apiKey} />
+        return <OverviewPanel />
       case "whale-activity":
-        return <WhaleActivityPanel apiKey={apiKey} />
+        return <WhaleActivityPanel />
       case "dex-monitoring":
-        return <DexMonitoringPanel apiKey={apiKey} />
+        return <DexMonitoringPanel />
       case "token-flow":
-        return <TokenFlowPanel apiKey={apiKey} />
+        return <TokenFlowPanel />
       case "alerts":
-        return <AlertsPanel apiKey={apiKey} />
+        return <AlertsPanel />
       default:
-        return <OverviewPanel apiKey={apiKey} />
+        return <OverviewPanel />
     }
   }
 
   return (
     <SidebarInset className="p-0">
-      {apiKey || !showApiKeyModal ? (
-        renderPanel()
-      ) : (
-        <div className="flex h-full items-center justify-center">
-          <ApiKeyModal open={showApiKeyModal} onSave={saveApiKey} />
-        </div>
-      )}
+      {renderPanel()}
     </SidebarInset>
   )
 }

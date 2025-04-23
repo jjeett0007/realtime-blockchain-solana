@@ -4,6 +4,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { formatDistanceToNow } from "date-fns"
 import { ExternalLink, RefreshCw } from "lucide-react"
 import Link from "next/link"
+import { formatAddress } from "../useables/formatAddress"
 
 interface WhaleTransaction {
   id: string
@@ -25,7 +26,7 @@ interface WhaleTransactionsTableProps {
   isLoading?: boolean
 }
 
-export function WhaleTransactionsTable({ transactions, isLoading = false }: WhaleTransactionsTableProps) {
+export function WhaleTransactionsTable({ transactions = [], isLoading = false }: WhaleTransactionsTableProps) {
   // If no transactions, show placeholder data
   const data = transactions.length > 0 ? transactions : []
 
@@ -36,13 +37,7 @@ export function WhaleTransactionsTable({ transactions, isLoading = false }: Whal
     return signature
   }
 
-  const formatAddress = (address: string) => {
-    if (address === "Multiple" || address === "Unknown") return address
-    if (address.length > 12) {
-      return `${address.substring(0, 6)}...${address.substring(address.length - 6)}`
-    }
-    return address
-  }
+
 
   return (
     <div className="w-full overflow-auto">

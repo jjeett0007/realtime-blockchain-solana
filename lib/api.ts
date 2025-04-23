@@ -6,6 +6,8 @@ const API_BASE_URL = "https://pro-api.solscan.io/v2.0"
 // Base URL for CoinGecko API
 const COINGECKO_API_URL = "https://api.coingecko.com/api/v3"
 
+const DEFAULT_API_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjcmVhdGVkQXQiOjE3NDM1MDkzMTI1MjgsImVtYWlsIjoiamplZXR0MDAwMDdAZ21haWwuY29tIiwiYWN0aW9uIjoidG9rZW4tYXBpIiwiYXBpVmVyc2lvbiI6InYyIiwiaWF0IjoxNzQzNTA5MzEyfQ.GjtrzJmSbzbEJTjOw-N6kn6_o_7IjRcsg99Xc3Svz_8"
+
 // Token addresses
 export const TOKEN_ADDRESSES = {
   SOL: "So11111111111111111111111111111111111111112",
@@ -19,11 +21,11 @@ const getHeaders = (apiKey: string) => ({
 })
 
 // Fetch recent transactions
-export async function fetchRecentTransactions(apiKey: string) {
+export async function fetchRecentTransactions() {
   try {
     const response = await fetch(`${API_BASE_URL}/transaction/last?limit=10&filter=exceptVote&`, {
       method: "GET",
-      headers: getHeaders(apiKey),
+      headers: getHeaders(DEFAULT_API_KEY),
     })
 
     if (!response.ok) {
@@ -81,7 +83,7 @@ export async function fetchSolanaPrice() {
 }
 
 // Fetch general Solana stats
-export async function fetchSolanaStats(apiKey: string) {
+export async function fetchSolanaStats() {
   try {
     // Fetch real price data from CoinGecko
     const priceData = await fetchSolanaPrice()
@@ -109,11 +111,11 @@ export async function fetchSolanaStats(apiKey: string) {
 }
 
 // Fetch USDC whale transactions
-export async function fetchUSDCWhaleTransactions(apiKey: string) {
+export async function fetchUSDCWhaleTransactions() {
   try {
     const requestOptions = {
       method: "GET",
-      headers: getHeaders(apiKey),
+      headers: getHeaders(DEFAULT_API_KEY),
     }
 
     const response = await fetch(
@@ -166,11 +168,11 @@ export async function fetchUSDCWhaleTransactions(apiKey: string) {
 }
 
 // Add a new function to fetch USDT whale transactions
-export async function fetchUSDTWhaleTransactions(apiKey: string) {
+export async function fetchUSDTWhaleTransactions() {
   try {
     const requestOptions = {
       method: "GET",
-      headers: getHeaders(apiKey),
+      headers: getHeaders(DEFAULT_API_KEY),
     }
 
     const response = await fetch(
@@ -223,45 +225,71 @@ export async function fetchUSDTWhaleTransactions(apiKey: string) {
 }
 
 // Update the fetchWhaleTransactions function to handle "all" tokens properly
-export async function fetchWhaleTransactions(apiKey: string, selectedToken = "all") {
+export async function fetchWhaleTransactions(selectedToken = "all") {
   try {
     // If a specific token is selected, use the dedicated function
-    if (selectedToken === TOKEN_ADDRESSES.USDC) {
-      return await fetchUSDCWhaleTransactions(apiKey)
-    } else if (selectedToken === TOKEN_ADDRESSES.USDT) {
-      return await fetchUSDTWhaleTransactions(apiKey)
-    } else if (selectedToken === TOKEN_ADDRESSES.SOL) {
-      // For SOL, use the generic function with appropriate amount
-      const amount = 100000 * 1000000000 // 100,000 SOL (in lamports)
-      return await fetchTokenWhaleTransactions(apiKey, selectedToken, amount)
+    const tokenHandlers: Record<string, () => Promise<any>> = {
+      [TOKEN_ADDRESSES.USDC]: fetchUSDCWhaleTransactions,
+      [TOKEN_ADDRESSES.USDT]: fetchUSDTWhaleTransactions,
+      [TOKEN_ADDRESSES.SOL]: async () => {
+        const amount = 100000 * 1000000000 // 100,000 SOL (in lamports)
+        return fetchTokenWhaleTransactions(TOKEN_ADDRESSES.SOL, amount)
+      },
+    }
+
+    if (tokenHandlers[selectedToken]) {
+      const txData = await tokenHandlers[selectedToken]()
+
+      const simplifiedTransactions = txData.map((tx: { id: any; sender: any; amount: any; token: any; blockTime: any }) => ({
+        id: tx.id,
+        address: tx.sender,
+        balance: tx.amount,
+        tokens: tx.token,
+        value: tx.token,
+        lastActivity: tx.blockTime,
+      }))
+
+      return {
+        txData,
+        address: simplifiedTransactions,
+      }
     }
 
     // For "all", fetch both USDC and USDT transactions and combine them
     if (selectedToken === "all") {
       try {
-        // Fetch transactions for USDC and USDT using Promise.all
-        const [usdcTransactions, usdtTransactions] = await Promise.all([
-          fetchUSDCWhaleTransactions(apiKey).catch((error) => {
-            console.error("Error fetching USDC transactions:", error)
-            return [] // Return empty array on error
-          }),
-          fetchUSDTWhaleTransactions(apiKey).catch((error) => {
-            console.error("Error fetching USDT transactions:", error)
-            return [] // Return empty array on error
-          }),
+        // Fetch transactions for USDC and USDT concurrently
+        const tokenTransactions = await Promise.allSettled([
+          fetchUSDCWhaleTransactions(),
+          fetchUSDTWhaleTransactions(),
         ])
 
-        // Combine all transactions into a single array
-        const allTransactions = [...usdcTransactions, ...usdtTransactions]
+        // Extract fulfilled results and flatten into a single array
+        const allTransactions = tokenTransactions
+          .filter(result => result.status === "fulfilled")
+          .flatMap(result => (result as PromiseFulfilledResult<any[]>).value)
 
-        // Sort by time (newest first)
-        allTransactions.sort((a, b) => new Date(b.blockTime).getTime() - new Date(a.blockTime).getTime())
+        // Sort by time (newest first) and limit to 10 transactions
+        const sortedTransactions = allTransactions
+          .sort((a, b) => new Date(b.blockTime).getTime() - new Date(a.blockTime).getTime())
+          .slice(0, 10)
 
-        // Limit to 10 transactions
-        return allTransactions.slice(0, 10)
+        // Simplify transactions for address data
+        const simplifiedTransactions = sortedTransactions.map(tx => ({
+          id: tx.id,
+          address: tx.sender,
+          balance: tx.amount,
+          tokens: tx.token,
+          value: tx.token,
+          lastActivity: tx.blockTime,
+        }))
+
+        return {
+          txData: sortedTransactions,
+          address: simplifiedTransactions,
+        }
       } catch (error) {
         console.error("Error fetching all token transactions:", error)
-        // If Promise.all fails, we'll return an empty array
         return []
       }
     }
@@ -275,13 +303,13 @@ export async function fetchWhaleTransactions(apiKey: string, selectedToken = "al
 }
 
 // Generic function for other tokens (SOL, USDT)
-export async function fetchTokenWhaleTransactions(apiKey: string, tokenAddress: string, minAmount: number) {
+export async function fetchTokenWhaleTransactions(tokenAddress: string, minAmount: number) {
   try {
     const response = await fetch(
       `${API_BASE_URL}/token/transfer?address=${tokenAddress}&amount[]=${minAmount}&page=1&page_size=10&sort_by=block_time&sort_order=desc`,
       {
         method: "GET",
-        headers: getHeaders(apiKey),
+        headers: getHeaders(DEFAULT_API_KEY),
       },
     )
 
@@ -333,7 +361,7 @@ export async function fetchTokenWhaleTransactions(apiKey: string, tokenAddress: 
 }
 
 // Fetch whale wallets
-export async function fetchWhaleWallets(apiKey: string) {
+export async function fetchWhaleWallets() {
   // Mock data - in a real app, this would call the Solscan API
   return [
     {
@@ -380,7 +408,7 @@ export async function fetchWhaleWallets(apiKey: string) {
 }
 
 // Fetch DEX transactions
-export async function fetchDexTransactions(apiKey: string, dex = "all") {
+export async function fetchDexTransactions(dex = "all") {
   // Mock data - in a real app, this would call the Solscan API
   const allTransactions = [
     {
@@ -443,7 +471,7 @@ export async function fetchDexTransactions(apiKey: string, dex = "all") {
 }
 
 // Fetch liquidity pools
-export async function fetchLiquidityPools(apiKey: string, dex = "all") {
+export async function fetchLiquidityPools(dex = "all") {
   // Mock data - in a real app, this would call the Solscan API
   const allPools = [
     {
@@ -501,7 +529,7 @@ export async function fetchLiquidityPools(apiKey: string, dex = "all") {
 }
 
 // Fetch token flows
-export async function fetchTokenFlows(apiKey: string) {
+export async function fetchTokenFlows() {
   // Mock data - in a real app, this would call the Solscan API
   return [
     {

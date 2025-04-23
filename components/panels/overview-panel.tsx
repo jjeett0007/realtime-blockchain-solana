@@ -10,26 +10,30 @@ import { fetchSolanaStats, fetchRecentTransactions } from "@/lib/api"
 import { Skeleton } from "@/components/ui/skeleton"
 import { RefreshCw } from "lucide-react"
 
-interface OverviewPanelProps {
-  apiKey: string
-}
 
-export default function OverviewPanel({ apiKey }: OverviewPanelProps) {
+
+export default function OverviewPanel() {
   const [loading, setLoading] = useState(true)
-  const [stats, setStats] = useState(null)
+  interface Stats {
+    price: any
+    priceChange: any
+    tps: number
+    blockTime: number
+    marketCap: number
+  }
+  
+  const [stats, setStats] = useState<Stats | null>(null)
   const [transactions, setTransactions] = useState([])
   const [refreshCount, setRefreshCount] = useState(0)
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null)
 
   useEffect(() => {
-    if (!apiKey) return
-
     const fetchData = async () => {
       setLoading(true)
       try {
         // Fetch real transaction data from the API
-        const txData = await fetchRecentTransactions(apiKey)
-        const statsData = await fetchSolanaStats(apiKey)
+        const txData = await fetchRecentTransactions()
+        const statsData = await fetchSolanaStats()
 
         setTransactions(txData)
         setStats(statsData)
@@ -42,6 +46,7 @@ export default function OverviewPanel({ apiKey }: OverviewPanelProps) {
     }
 
     fetchData()
+    
 
     // Set up polling for real-time updates
     // Transactions every 15 seconds
@@ -52,7 +57,7 @@ export default function OverviewPanel({ apiKey }: OverviewPanelProps) {
     // Price data every 5 minutes (300,000 ms)
     const priceInterval = setInterval(async () => {
       try {
-        const statsData = await fetchSolanaStats(apiKey)
+        const statsData = await fetchSolanaStats()
         setStats(statsData)
         setLastUpdated(new Date())
       } catch (error) {
@@ -64,7 +69,9 @@ export default function OverviewPanel({ apiKey }: OverviewPanelProps) {
       clearInterval(txInterval)
       clearInterval(priceInterval)
     }
-  }, [apiKey, refreshCount])
+  }, [refreshCount])
+
+  
 
   return (
     <div className="flex flex-col h-full">

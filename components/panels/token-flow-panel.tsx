@@ -11,23 +11,30 @@ import { fetchTokenFlows } from "@/lib/api"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Search } from "lucide-react"
 
-interface TokenFlowPanelProps {
-  apiKey: string
-}
 
-export default function TokenFlowPanel({ apiKey }: TokenFlowPanelProps) {
+export default function TokenFlowPanel() {
   const [loading, setLoading] = useState(true)
-  const [tokenFlows, setTokenFlows] = useState([])
+  interface TokenFlow {
+    id: string
+    signature: string
+    blockTime: string
+    token: string
+    amount: string
+    sender: string
+    receiver: string
+    senderType: string
+    receiverType: string
+  }
+
+  const [tokenFlows, setTokenFlows] = useState<TokenFlow[]>([])
   const [searchQuery, setSearchQuery] = useState("")
 
   useEffect(() => {
-    if (!apiKey) return
-
     const fetchData = async () => {
       setLoading(true)
       try {
         // In a real application, this would be an actual API call
-        const flowData = await fetchTokenFlows(apiKey)
+        const flowData = await fetchTokenFlows()
         setTokenFlows(flowData)
       } catch (error) {
         console.error("Error fetching token flow data:", error)
@@ -42,11 +49,10 @@ export default function TokenFlowPanel({ apiKey }: TokenFlowPanelProps) {
     const interval = setInterval(fetchData, 30000) // Update every 30 seconds
 
     return () => clearInterval(interval)
-  }, [apiKey])
+  }, [])
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
-    // In a real app, this would trigger a search API call
     console.log("Searching for token:", searchQuery)
   }
 

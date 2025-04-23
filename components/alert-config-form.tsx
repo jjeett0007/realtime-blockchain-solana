@@ -11,10 +11,9 @@ import { Switch } from "@/components/ui/switch"
 
 interface AlertConfigFormProps {
   onCancel: () => void
-  apiKey: string
 }
 
-export function AlertConfigForm({ onCancel, apiKey }: AlertConfigFormProps) {
+export function AlertConfigForm({ onCancel }: AlertConfigFormProps) {
   const [alertType, setAlertType] = useState("")
   const [threshold, setThreshold] = useState("")
   const [timeframe, setTimeframe] = useState("1h")
@@ -32,7 +31,6 @@ export function AlertConfigForm({ onCancel, apiKey }: AlertConfigFormProps) {
       notifyEmail,
       notifyWebhook,
       webhookUrl,
-      apiKey,
     })
 
     onCancel() // Close the form after submission
