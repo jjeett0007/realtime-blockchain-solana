@@ -20,39 +20,50 @@ interface WhaleActivityPanelProps {
   apiKey: string
 }
 
-export default function WhaleActivityPanel({ apiKey }: WhaleActivityPanelProps) {
+export default function WhaleActivityPanel() {
   const [loading, setLoading] = useState(true)
   const [transactions, setTransactions] = useState([])
-  const [wallets, setWallets] = useState([])
+  const [wallets, setWallets] = useState<{ id: string; address: string; balance: string; value: string; tokens: string; lastActivity: string; }[]>([])
   const [searchQuery, setSearchQuery] = useState("")
-  const [selectedToken, setSelectedToken] = useState("all") // Default to "all" tokens
+  const [selectedToken, setSelectedToken] = useState(TOKEN_ADDRESSES.USDC) // Default to "all" tokens
   const [refreshCount, setRefreshCount] = useState(0)
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null)
   const [error, setError] = useState<string | null>(null)
-  const [allTransactions, setAllTransactions] = useState([]) // Store all transactions for chart
+  const [allTransactions, setAllTransactions] = useState<any[]>([])
 
   useEffect(() => {
-    if (!apiKey) return
-
     const fetchData = async () => {
       setLoading(true)
       setError(null)
       try {
         // Fetch whale transactions for the selected token
-        const txData = await fetchWhaleTransactions(apiKey, selectedToken)
-        const walletsData = await fetchWhaleWallets(apiKey)
+        const result = await fetchWhaleTransactions(selectedToken)
+        console.log(result)
 
-        setTransactions(txData)
+        if ('txData' in result && 'address' in result) {
+          const { txData, address } = result
+          setTransactions(txData)
+          setAllTransactions((prevAll) => {
+            const existingIds = new Set(prevAll.map((tx: any) => tx.id))
+            const newTxs = txData.filter((tx: any) => !existingIds.has(tx.id))
+            return [...prevAll, ...newTxs]
+          })
+          setTransactions(txData)
+          setLastUpdated(new Date())
+          setWallets(address ?? [])
+        } else {
+          // console.error("Unexpected response format:", result)
+          setError("Failed to fetch whale transactions. Unexpected response format.")
+        }
+        // console.log(txData)
+
+        // const walletsData = await fetchWhaleWallets()
+
 
         // Add new transactions to allTransactions without duplicates
-        setAllTransactions((prevAll) => {
-          const existingIds = new Set(prevAll.map((tx: any) => tx.id))
-          const newTxs = txData.filter((tx: any) => !existingIds.has(tx.id))
-          return [...prevAll, ...newTxs]
-        })
 
-        setWallets(walletsData)
-        setLastUpdated(new Date())
+
+
       } catch (error) {
         console.error("Error fetching whale data:", error)
         setError("Failed to fetch whale activity data. Please try again later.")
@@ -69,7 +80,7 @@ export default function WhaleActivityPanel({ apiKey }: WhaleActivityPanelProps) 
     }, 30000)
 
     return () => clearInterval(interval)
-  }, [apiKey, selectedToken, refreshCount])
+  }, [selectedToken, refreshCount])
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
@@ -145,7 +156,7 @@ export default function WhaleActivityPanel({ apiKey }: WhaleActivityPanelProps) 
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Tokens</SelectItem>
-              <SelectItem value={TOKEN_ADDRESSES.SOL}>SOL</SelectItem>
+              {/* <SelectItem value={TOKEN_ADDRESSES.SOL}>SOL</SelectItem> */}
               <SelectItem value={TOKEN_ADDRESSES.USDC}>USDC</SelectItem>
               <SelectItem value={TOKEN_ADDRESSES.USDT}>USDT</SelectItem>
             </SelectContent>

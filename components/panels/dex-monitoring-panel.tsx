@@ -13,21 +13,22 @@ interface DexMonitoringPanelProps {
   apiKey: string
 }
 
-export default function DexMonitoringPanel({ apiKey }: DexMonitoringPanelProps) {
+export default function DexMonitoringPanel() {
   const [loading, setLoading] = useState(true)
-  const [transactions, setTransactions] = useState([])
-  const [pools, setPools] = useState([])
+  const [transactions, setTransactions] = useState<
+    { id: string; signature: string; blockTime: string; dex: string; fromToken: string; toToken: string; fromAmount: string; toAmount: string; }[]
+  >([])
+  const [pools, setPools] = useState<
+    { id: string; address: string; dex: string; pair: string; liquidity: string; volume24h: string; apy: string; }[]
+  >([])
   const [selectedDex, setSelectedDex] = useState("all")
 
   useEffect(() => {
-    if (!apiKey) return
-
     const fetchData = async () => {
       setLoading(true)
       try {
-        // In a real application, these would be actual API calls
-        const txData = await fetchDexTransactions(apiKey, selectedDex)
-        const poolsData = await fetchLiquidityPools(apiKey, selectedDex)
+        const txData = await fetchDexTransactions(selectedDex)
+        const poolsData = await fetchLiquidityPools(selectedDex)
 
         setTransactions(txData)
         setPools(poolsData)
@@ -44,7 +45,7 @@ export default function DexMonitoringPanel({ apiKey }: DexMonitoringPanelProps) 
     const interval = setInterval(fetchData, 30000) // Update every 30 seconds
 
     return () => clearInterval(interval)
-  }, [apiKey, selectedDex])
+  }, [selectedDex])
 
   return (
     <div className="flex flex-col h-full">

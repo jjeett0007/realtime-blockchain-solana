@@ -12,7 +12,7 @@ interface AlertsPanelProps {
   apiKey: string
 }
 
-export default function AlertsPanel({ apiKey }: AlertsPanelProps) {
+export default function AlertsPanel() {
   const [showForm, setShowForm] = useState(false)
 
   // Mock alerts data
@@ -61,7 +61,7 @@ export default function AlertsPanel({ apiKey }: AlertsPanelProps) {
               <CardDescription>Configure parameters for your new alert</CardDescription>
             </CardHeader>
             <CardContent className="px-3 sm:px-6">
-              <AlertConfigForm onCancel={() => setShowForm(false)} apiKey={apiKey} />
+              <AlertConfigForm onCancel={() => setShowForm(false)} />
             </CardContent>
           </Card>
         ) : null}
