@@ -15,12 +15,12 @@ import { AlertCircle, RefreshCw, Search } from "lucide-react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { WhaleTransactionVolumeChart } from "@/components/charts/whale-transaction-volume-chart"
+import { useRouter } from "next/navigation"
 
-interface WhaleActivityPanelProps {
-  apiKey: string
-}
 
 export default function WhaleActivityPanel() {
+  const router = useRouter()
+
   const [loading, setLoading] = useState(true)
   const [transactions, setTransactions] = useState([])
   const [wallets, setWallets] = useState<{ id: string; address: string; balance: string; value: string; tokens: string; lastActivity: string; }[]>([])
@@ -77,6 +77,9 @@ export default function WhaleActivityPanel() {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
     // In a real app, this would trigger a search API call
+    if (searchQuery.trim()) {
+      router.push(`/account/${searchQuery.trim()}`)
+    }
 
   }
 
