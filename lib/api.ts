@@ -1,3 +1,4 @@
+
 // API service for the JET SCAN Monitor
 // This file contains functions to fetch data from the Solscan API and CoinGecko
 
@@ -298,6 +299,45 @@ export async function fetchWhaleTransactions(selectedToken = "all") {
     return []
   } catch (error) {
     console.error("Error fetching whale transactions:", error)
+    return []
+  }
+}
+
+// Get Wallet Portfolio
+export async function fetchWalletPortfolio(walletAddress: string) {
+  try {
+    const response = await fetch(
+      `${API_BASE_URL}/account/portfolio?address=${walletAddress}`,
+      {
+        method: "GET",
+        headers: getHeaders(DEFAULT_API_KEY),
+      },
+    )
+
+    const data = await response.json()
+
+    if (data.success && data.data) {
+      // Transform the API response to match our expected format
+      return data.data.tokens.map((token: any) => {
+        const tokenSymbol = token.token_symbol || "Unknown"
+        const tokenIcon = token.token_icon || ""
+        const formattedAmount = `${(token.amount / Math.pow(10, token.token_decimals)).toLocaleString()} ${tokenSymbol}`
+
+        return {
+          id: token.token_address,
+          name: token.token_name,
+          symbol: tokenSymbol,
+          icon: tokenIcon,
+          amount: formattedAmount,
+          value: `$${Number(token.value).toLocaleString()}`,
+        }
+      })
+    }
+
+
+  }
+  catch (error) {
+    console.error("Error fetching wallet portfolio:", error)
     return []
   }
 }

@@ -28,6 +28,7 @@ import {
 } from "lucide-react"
 import { formatDistanceToNow } from "date-fns"
 import Link from "next/link"
+import { fetchWalletPortfolio } from "@/lib/api"
 
 // Update the API_KEY constant to ensure it's correct
 const API_KEY =
@@ -108,37 +109,13 @@ export default function AccountPage() {
   const fetchTokenAccounts = async () => {
     setLoading((prev) => ({ ...prev, tokens: true }))
     try {
-      const requestOptions = {
-        method: "GET",
-        headers: {
-          token: API_KEY,
-          "Content-Type": "application/json",
-        },
-      }
 
-      try {
-        const response = await fetch(
-          `https://pro-api.solscan.io/v2.0/account/token-accounts?address=${address}&type=token&page=1&page_size=20`,
-          requestOptions,
-        )
+      const portfolio = await fetchWalletPortfolio(address);
 
-        if (!response.ok) {
-          const errorText = await response.text()
-          console.error(`API response error: ${response.status} - ${errorText}`)
-          throw new Error(`API request failed with status ${response.status}`)
-        }
+      console.log(portfolio);
 
-        const data = await response.json()
-
-        if (data.success) {
-          setTokenAccounts(data.data || [])
-        } else {
-          console.error("API returned success: false", data)
-          setTokenAccounts([])
-        }
-      } catch (fetchError) {
-        console.error("Fetch error in token accounts:", fetchError)
-        setTokenAccounts([])
+      if (portfolio) {
+        setTokenAccounts(portfolio);
       }
     } catch (error) {
       console.error("Error fetching token accounts:", error)
@@ -465,7 +442,7 @@ export default function AccountPage() {
           </CardContent>
         </Card>
 
-         {/* Tabs for Transfers and DeFi Activities */}
+        {/* Tabs for Transfers and DeFi Activities */}
         <Tabs defaultValue="transfers" className="mb-6">
           <TabsList className="bg-primary/10 dark:bg-primary/20 w-full">
             <TabsTrigger
@@ -517,14 +494,14 @@ export default function AccountPage() {
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {transfers.map((transfer) => {
+                        {transfers.map((transfer, index) => {
                           const isOutgoing = transfer.flow === "out"
                           const tokenInfo = getTokenInfo(transfer.token_address, transfer.metadata)
                           const formattedAmount = formatTokenAmount(transfer.amount, transfer.token_decimals)
                           const counterpartyAddress = isOutgoing ? transfer.to_address : transfer.from_address
 
                           return (
-                            <TableRow key={transfer.trans_id}>
+                            <TableRow key={`${transfer.trans_id}-${index}`}>
                               <TableCell className="font-mono text-xs">
                                 <Link href={`/tx/${transfer.trans_id}`} className="hover:text-primary hover:underline">
                                   {formatAddress(transfer.trans_id, 8)}
@@ -551,7 +528,7 @@ export default function AccountPage() {
                                         alt={tokenInfo.name}
                                         className="w-full h-full object-contain"
                                         onError={(e) => {
-                                          ;(e.target as HTMLImageElement).style.display = "none"
+                                          ; (e.target as HTMLImageElement).style.display = "none"
                                         }}
                                       />
                                     </div>
@@ -579,8 +556,7 @@ export default function AccountPage() {
                               <TableCell>${transfer.value ? Number(transfer.value).toLocaleString() : "N/A"}</TableCell>
                               <TableCell>
                                 <a
-                                  href={`https://solscan.io/tx/${transfer.trans_id}`}
-                                  target="_blank"
+                                  href={`/tx/${transfer.trans_id}`}
                                   rel="noopener noreferrer"
                                   className="text-muted-foreground hover:text-primary"
                                 >
@@ -634,7 +610,7 @@ export default function AccountPage() {
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {defiActivities.map((activity) => {
+                        {defiActivities.map((activity, index) => {
                           const platform = Array.isArray(activity.platform) ? activity.platform[0] : activity.platform
                           const platformName = getPlatformName(platform)
                           const activityType = getActivityTypeDisplay(activity.activity_type)
@@ -667,7 +643,7 @@ export default function AccountPage() {
                           }
 
                           return (
-                            <TableRow key={`${activity.trans_id}-${activity.activity_type}`}>
+                            <TableRow key={`${activity.trans_id}-${activity.activity_type}-${index}`}>
                               <TableCell className="font-mono text-xs">
                                 <Link href={`/tx/${activity.trans_id}`} className="hover:text-primary hover:underline">
                                   {formatAddress(activity.trans_id, 8)}
@@ -738,37 +714,41 @@ export default function AccountPage() {
                     <TableRow>
                       <TableHead>Token</TableHead>
                       <TableHead>Balance</TableHead>
+                      <TableHead>Value (USD)</TableHead>
                       <TableHead>Token Account</TableHead>
                       <TableHead className="w-[50px]"></TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {tokenAccounts.map((account) => {
+                    {tokenAccounts.map((account, index) => {
                       const tokenInfo = getTokenInfo(account.token_address, { tokens: account.metadata?.tokens })
                       return (
-                        <TableRow key={account.token_account}>
+                        <TableRow key={index}>
                           <TableCell>
                             <div className="flex items-center gap-2">
-                              {tokenInfo.icon && (
-                                <div className="w-5 h-5 relative">
-                                  <img
-                                    src={tokenInfo.icon || "/placeholder.svg"}
-                                    alt={tokenInfo.name}
-                                    className="w-full h-full object-contain"
-                                    onError={(e) => {
-                                      ;(e.target as HTMLImageElement).style.display = "none"
-                                    }}
-                                  />
-                                </div>
-                              )}
-                              <span>{tokenInfo.name}</span>
+                              <div className="w-5 h-5 relative">
+                                <img
+                                  src={account.icon || "/placeholder.svg"}
+                                  alt={account.name}
+                                  className="w-full h-full object-contain"
+                                  onError={(e) => {
+                                    ; (e.target as HTMLImageElement).style.display = "none"
+                                  }}
+                                />
+                              </div>
+                              <span>{account.name}</span>
                             </div>
                           </TableCell>
-                          <TableCell>{formatTokenAmount(account.amount, account.token_decimals)}</TableCell>
-                          <TableCell className="font-mono text-xs">{formatAddress(account.token_account, 8)}</TableCell>
+                          <TableCell>
+                            <div>{account.amount}</div>
+                          </TableCell>
+                          <TableCell>
+                            <div>{account.value}</div>
+                          </TableCell>
+                          <TableCell className="font-mono text-xs">{formatAddress(account.id, 8)}</TableCell>
                           <TableCell>
                             <a
-                              href={`https://solscan.io/token/${account.token_address}`}
+                              href={`https://solscan.io/token/${account.id}`}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="text-muted-foreground hover:text-primary"
@@ -787,7 +767,7 @@ export default function AccountPage() {
           </CardContent>
         </Card>
 
-       
+
 
         {lastUpdated && (
           <div className="flex justify-end items-center text-muted-foreground text-xs">

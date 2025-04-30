@@ -152,39 +152,6 @@ export default function OverviewPanel() {
             </Card>
           </TabsContent>
         </Tabs>
-
-        <div className="grid gap-6 md:grid-cols-2">
-          <Card>
-            <CardHeader className="px-3 sm:px-6">
-              <CardTitle>Transaction Volume (24h)</CardTitle>
-              <CardDescription>Transaction volume over the last 24 hours</CardDescription>
-            </CardHeader>
-            <CardContent className="h-[250px] sm:h-[300px] px-3 sm:px-6">
-              {loading && !stats ? (
-                <Skeleton className="h-full w-full" />
-              ) : (
-                <div className="h-full flex items-center justify-center text-muted-foreground">
-                  Chart will be displayed here
-                </div>
-              )}
-            </CardContent>
-          </Card>
-          <Card className="mt-6 md:mt-0">
-            <CardHeader className="px-3 sm:px-6">
-              <CardTitle>Top Tokens (24h)</CardTitle>
-              <CardDescription>Most active tokens by volume</CardDescription>
-            </CardHeader>
-            <CardContent className="h-[250px] sm:h-[300px] px-3 sm:px-6">
-              {loading && !stats ? (
-                <Skeleton className="h-full w-full" />
-              ) : (
-                <div className="h-full flex items-center justify-center text-muted-foreground">
-                  Chart will be displayed here
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </div>
       </div>
     </div>
   )

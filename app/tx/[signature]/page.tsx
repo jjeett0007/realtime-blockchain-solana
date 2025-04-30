@@ -26,7 +26,7 @@ import Link from "next/link"
 
 type TransactionDetailsProps = {}
 
-export default function TransactionDetailsPage({}: TransactionDetailsProps) {
+export default function TransactionDetailsPage({ }: TransactionDetailsProps) {
   const params = useParams()
   const router = useRouter()
   const [txData, setTxData] = useState<any>(null)
@@ -128,10 +128,10 @@ export default function TransactionDetailsPage({}: TransactionDetailsProps) {
           variant="outline"
           size="sm"
           className="bg-white/10 border-white/20 text-white hover:bg-white/20"
-          onClick={() => router.back()}
+          onClick={() => router.push("/")}
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
-          Back
+          Dashboard
         </Button>
       </div>
 
@@ -280,7 +280,7 @@ export default function TransactionDetailsPage({}: TransactionDetailsProps) {
                                             alt={tokenInfo.token_symbol}
                                             className="w-full h-full object-contain"
                                             onError={(e) => {
-                                              ;(e.target as HTMLImageElement).style.display = "none"
+                                              ; (e.target as HTMLImageElement).style.display = "none"
                                             }}
                                           />
                                         </div>
