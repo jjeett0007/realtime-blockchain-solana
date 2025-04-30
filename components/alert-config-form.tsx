@@ -24,14 +24,7 @@ export function AlertConfigForm({ onCancel }: AlertConfigFormProps) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     // In a real app, this would send the alert configuration to an API
-    console.log({
-      alertType,
-      threshold,
-      timeframe,
-      notifyEmail,
-      notifyWebhook,
-      webhookUrl,
-    })
+
 
     onCancel() // Close the form after submission
   }

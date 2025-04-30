@@ -38,7 +38,7 @@ export default function WhaleActivityPanel() {
       try {
         // Fetch whale transactions for the selected token
         const result = await fetchWhaleTransactions(selectedToken)
-        console.log(result)
+
 
         if ('txData' in result && 'address' in result) {
           const { txData, address } = result
@@ -55,14 +55,6 @@ export default function WhaleActivityPanel() {
           // console.error("Unexpected response format:", result)
           setError("Failed to fetch whale transactions. Unexpected response format.")
         }
-        // console.log(txData)
-
-        // const walletsData = await fetchWhaleWallets()
-
-
-        // Add new transactions to allTransactions without duplicates
-
-
 
       } catch (error) {
         console.error("Error fetching whale data:", error)
@@ -85,7 +77,7 @@ export default function WhaleActivityPanel() {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
     // In a real app, this would trigger a search API call
-    console.log("Searching for:", searchQuery)
+
   }
 
   const handleTokenChange = (value: string) => {

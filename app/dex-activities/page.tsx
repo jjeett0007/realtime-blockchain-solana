@@ -94,7 +94,7 @@ export default function DexActivitiesPage() {
 
         if (!response.ok) {
           const errorText = await response.text()
-          console.error(`API response error: ${response.status} - ${errorText}`)
+          
           throw new Error(`API request failed with status ${response.status}`)
         }
 
@@ -104,7 +104,7 @@ export default function DexActivitiesPage() {
           setActivities(data.data)
           setLastUpdated(new Date())
         } else {
-          console.error("API returned success: false", data)
+          
           setActivities([])
           setError("Failed to fetch DEX activities. The API returned an unsuccessful response.")
         }
