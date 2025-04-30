@@ -1,30 +1,136 @@
-# Solana Hackathon Challenge
 
-*Automatically synced with your [v0.dev](https://v0.dev) deployments*
+# 🛰️ JET SCAN MONITOR
 
-[![Deployed on Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black?style=for-the-badge&logo=vercel)](https://vercel.com/jjeett0007s-projects/v0-solana-hackathon-challenge-mh)
-[![Built with v0](https://img.shields.io/badge/Built%20with-v0.dev-black?style=for-the-badge)](https://v0.dev/chat/projects/Uto6P5i1UpM)
+**JET SCAN MONITOR** is a real-time Solana blockchain monitoring dashboard built entirely on the frontend using Solscan APIs. Designed for the **Solscan Monitoring Masters Hackathon**, it provides actionable insights into whale transactions, DeFi protocol activity, and wallet-level intelligence — all without a backend server.
 
-## Overview
+---
 
-This repository will stay in sync with your deployed chats on [v0.dev](https://v0.dev).
-Any changes you make to your deployed app will be automatically pushed to this repository from [v0.dev](https://v0.dev).
+## 🚀 Features
 
-## Deployment
+### 🔄 Latest Block Transactions
+- Real-time feed of the most recent transactions on Solana.
+- Quickly access transaction IDs, token transfers, and involved accounts.
 
-Your project is live at:
+### 🐋 Whale Activity Tracking
+- Detect and display high-volume transfers involving:
+  - **USDT**
+  - **USDC**
+- Includes:
+  - Whale wallet addresses
+  - Transfer amounts
+  - Associated charts showing trends and volume changes
 
-**[https://vercel.com/jjeett0007s-projects/v0-solana-hackathon-challenge-mh](https://vercel.com/jjeett0007s-projects/v0-solana-hackathon-challenge-mh)**
+### 📊 Whale Analytics
+- Charts and summaries showing:
+  - Active whale wallets
+  - USDT/USDC volume trends
+  - Top token transfers
 
-## Build your app
+### 💸 DeFi Monitoring
+- Tracks transactions and activity types from major Solana DeFi protocols:
+  - **Pump.fun**
+  - **Raydium**
+  - **Jupiter**
+  - **Orca**
+- Shows:
+  - Transaction type (swap, mint, etc.)
+  - Token addresses
+  - Transaction IDs
+  - Transfer amounts
 
-Continue building your app on:
+### 👤 Wallet Account Page
+- Enter any wallet address to view:
+  - Wallet account type
+  - Recent token transfers
+  - DeFi activities involving the wallet
+  - All associated token accounts
 
-**[https://v0.dev/chat/projects/Uto6P5i1UpM](https://v0.dev/chat/projects/Uto6P5i1UpM)**
+### 📑 Transaction Detail Page
+- Detailed, human-readable breakdown of a transaction:
+  - Timestamp
+  - Fee
+  - Token transfers
+  - Instructions with decoded descriptions
+  - Accounts involved and balance changes
+  - Logs for deeper inspection
 
-## How It Works
+---
 
-1. Create and modify your project using [v0.dev](https://v0.dev)
-2. Deploy your chats from the v0 interface
-3. Changes are automatically pushed to this repository
-4. Vercel deploys the latest version from this repository
+## 🧰 Built With
+
+- **Next.js** – Frontend framework
+- **Tailwind CSS** – Styling
+- **Solscan Public API** – Real-time and historical blockchain data
+- **Chart.js / ApexCharts** – Interactive data visualizations
+
+> 🔒 No backend server — all logic is processed client-side.
+
+---
+
+## 📦 Solscan API Endpoints Used
+
+- `/transaction/tx` – Get full transaction info
+- `/account/tokens` – Get wallet token holdings
+- `/account/info` – Get wallet account metadata
+- `/transaction/token` – Token transfer history
+- `/market/token` – Token metadata
+- `/block/last` – Latest block hash
+- `/block/txs` – Transactions from recent blocks
+
+---
+
+## 🎯 Purpose & Benefits
+
+- Proves how **Solana's data layer is accessible** using just frontend tools.
+- Helps **developers, analysts, and users** understand whale and DeFi activity.
+- Promotes **on-chain transparency** without needing a complex backend setup.
+
+---
+
+## 🔗 Live Demo
+
+Visit: [https://jet-scan.vercel.app](https://jet-scan.vercel.app)
+
+---
+
+## 🧪 Local Development
+
+```bash
+# Clone the repo
+git clone https://github.com/your-username/jet-scan-monitor.git
+cd jet-scan-monitor
+
+# Install dependencies
+npm install
+
+# Add your Solscan API key
+echo "NEXT_PUBLIC_SOLSCAN_API_KEY=your_key_here" > .env.local
+
+# Start the development server
+npm run dev
+```
+
+---
+
+## 📁 Project Structure
+
+```
+├── components/         # UI components (wallet cards, charts, tables)
+├── pages/              # Route-based views (/, /tx/[id], /account/[address])
+├── utils/              # API clients and helper functions
+├── public/             # Static assets
+├── styles/             # Global and Tailwind CSS styles
+└── README.md
+```
+
+---
+
+## 📽️ Optional Video Walkthrough
+
+
+---
+
+## 🛡️ License
+
+MIT © [JET]
+```
