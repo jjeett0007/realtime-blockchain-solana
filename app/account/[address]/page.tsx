@@ -81,7 +81,7 @@ export default function AccountPage() {
 
         if (!response.ok) {
           const errorText = await response.text()
-          console.error(`API response error: ${response.status} - ${errorText}`)
+          
           throw new Error(`API request failed with status ${response.status}`)
         }
 
@@ -90,11 +90,10 @@ export default function AccountPage() {
         if (data.success) {
           setAccountDetails(data.data)
         } else {
-          console.error("API returned success: false", data)
+          
           setError("Failed to fetch account details. The account may not exist or the API may be unavailable.")
         }
       } catch (fetchError) {
-        console.error("Fetch error in account details:", fetchError)
         setError("Failed to fetch account details. Please try again later.")
       }
     } catch (error) {
@@ -112,13 +111,10 @@ export default function AccountPage() {
 
       const portfolio = await fetchWalletPortfolio(address);
 
-      console.log(portfolio);
-
       if (portfolio) {
         setTokenAccounts(portfolio);
       }
     } catch (error) {
-      console.error("Error fetching token accounts:", error)
       setTokenAccounts([])
     } finally {
       setLoading((prev) => ({ ...prev, tokens: false }))
@@ -146,7 +142,7 @@ export default function AccountPage() {
 
         if (!response.ok) {
           const errorText = await response.text()
-          console.error(`API response error: ${response.status} - ${errorText}`)
+          
           throw new Error(`API request failed with status ${response.status}`)
         }
 
@@ -155,17 +151,17 @@ export default function AccountPage() {
         if (data.success) {
           setTransfers(data.data || [])
         } else {
-          console.error("API returned success: false", data)
+          
           // Use empty array instead of throwing error
           setTransfers([])
         }
       } catch (fetchError) {
-        console.error("Fetch error in transfers:", fetchError)
+       
         // Use empty array instead of throwing error
         setTransfers([])
       }
     } catch (error) {
-      console.error("Error fetching transfers:", error)
+     
       // Don't set error here to avoid overwhelming the user with error messages
       setTransfers([])
     } finally {
@@ -193,7 +189,7 @@ export default function AccountPage() {
 
         if (!response.ok) {
           const errorText = await response.text()
-          console.error(`API response error: ${response.status} - ${errorText}`)
+          
           throw new Error(`API request failed with status ${response.status}`)
         }
 
@@ -202,15 +198,15 @@ export default function AccountPage() {
         if (data.success) {
           setDefiActivities(data.data || [])
         } else {
-          console.error("API returned success: false", data)
+          
           setDefiActivities([])
         }
       } catch (fetchError) {
-        console.error("Fetch error in DeFi activities:", fetchError)
+       
         setDefiActivities([])
       }
     } catch (error) {
-      console.error("Error fetching DeFi activities:", error)
+     
       setDefiActivities([])
     } finally {
       setLoading((prev) => ({ ...prev, defi: false }))
@@ -266,10 +262,10 @@ export default function AccountPage() {
     navigator.clipboard
       .writeText(text)
       .then(() => {
-        console.log("Copied to clipboard")
+       
       })
       .catch((err) => {
-        console.error("Failed to copy: ", err)
+       
       })
   }
 

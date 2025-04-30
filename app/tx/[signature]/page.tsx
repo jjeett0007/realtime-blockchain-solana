@@ -56,7 +56,7 @@ export default function TransactionDetailsPage({ }: TransactionDetailsProps) {
 
           if (!response.ok) {
             const errorText = await response.text()
-            console.error(`API response error: ${response.status} - ${errorText}`)
+            
             throw new Error(`API request failed with status ${response.status}`)
           }
 
@@ -65,7 +65,7 @@ export default function TransactionDetailsPage({ }: TransactionDetailsProps) {
           if (data.success) {
             setTxData(data)
           } else {
-            console.error("API returned success: false", data)
+            
             throw new Error("Failed to fetch transaction data")
           }
         } catch (fetchError) {
@@ -90,10 +90,10 @@ export default function TransactionDetailsPage({ }: TransactionDetailsProps) {
       .writeText(text)
       .then(() => {
         // Could add a toast notification here
-        console.log("Copied to clipboard")
+       
       })
       .catch((err) => {
-        console.error("Failed to copy: ", err)
+       
       })
   }
 

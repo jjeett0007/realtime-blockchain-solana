@@ -41,7 +41,6 @@ export function AlertsTable({ alerts }: AlertsTableProps) {
                   checked={alert.status === "Active"}
                   onCheckedChange={() => {
                     // In a real app, this would update the alert status via API
-                    console.log(`Toggle alert ${alert.id}`)
                   }}
                 />
               </TableCell>

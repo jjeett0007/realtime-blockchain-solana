@@ -53,7 +53,6 @@ export default function TokenFlowPanel() {
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
-    console.log("Searching for token:", searchQuery)
   }
 
   return (
