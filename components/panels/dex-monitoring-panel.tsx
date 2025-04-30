@@ -9,9 +9,6 @@ import { LiquidityPoolsTable } from "@/components/tables/liquidity-pools-table"
 import { fetchDexTransactions, fetchLiquidityPools } from "@/lib/api"
 import { Skeleton } from "@/components/ui/skeleton"
 
-interface DexMonitoringPanelProps {
-  apiKey: string
-}
 
 export default function DexMonitoringPanel() {
   const [loading, setLoading] = useState(true)
