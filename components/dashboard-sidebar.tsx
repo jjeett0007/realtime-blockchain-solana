@@ -54,7 +54,7 @@ export default function DashboardSidebar({ activeView, setActiveView }: Dashboar
                   <span>Whale Activity</span>
                 </SidebarMenuButton>
               </SidebarMenuItem>
-              
+
               <SidebarMenuItem>
                 <Link href="/dex-activities" passHref legacyBehavior>
                   <SidebarMenuButton asChild>
@@ -65,16 +65,10 @@ export default function DashboardSidebar({ activeView, setActiveView }: Dashboar
                   </SidebarMenuButton>
                 </Link>
               </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton isActive={activeView === "token-flow"} onClick={() => setActiveView("token-flow")}>
-                  <Coins />
-                  <span>Token Flow</span>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
-        <SidebarSeparator />
+        {/* <SidebarSeparator />
         <SidebarGroup>
           <SidebarGroupLabel>Alerts</SidebarGroupLabel>
           <SidebarGroupContent>
@@ -87,16 +81,16 @@ export default function DashboardSidebar({ activeView, setActiveView }: Dashboar
               </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
-        </SidebarGroup>
+        </SidebarGroup> */}
       </SidebarContent>
       <SidebarFooter className="p-4">
         <div className="flex items-center justify-between">
-          <Button variant="outline" size="icon" asChild className="border-sidebar-accent bg-sidebar-accent/10">
+          {/* <Button variant="outline" size="icon" asChild className="border-sidebar-accent bg-sidebar-accent/10">
             <a href="#settings">
               <Settings className="h-4 w-4 text-sidebar-accent" />
               <span className="sr-only">Settings</span>
             </a>
-          </Button>
+          </Button> */}
           <ThemeToggle />
         </div>
       </SidebarFooter>
